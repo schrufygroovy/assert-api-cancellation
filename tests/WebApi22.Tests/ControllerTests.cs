@@ -48,10 +48,14 @@ namespace WebApi22.Tests
             HttpResponseMessage responseMessage = null;
             await Task.WhenAll(
                 Task.Run(() =>
-                {
-                    tokenSource.Cancel();
-                }),
-                Task.Run(async () => responseMessage = await client.GetAsync(new Uri($"http://localhost/api/values/haxi?haxiIds={haxiGuid}"), token)));
+                    {
+                        Thread.Sleep(500);
+                        tokenSource.Cancel();
+                    }),
+                Task.Run(async () =>
+                    {
+                        responseMessage = await client.GetAsync(new Uri($"http://localhost/api/values/haxi?haxiIds={haxiGuid}"), token);
+                    }));
             Assert.That(
                 responseMessage.StatusCode,
                 Is.EqualTo((HttpStatusCode)499));
