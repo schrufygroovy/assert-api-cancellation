@@ -23,7 +23,7 @@ namespace WebApi31.Tests
         }
 
         [Test]
-        public async Task ShouldRespectCancellationToken()
+        public async Task Cancellation_ShouldReturn499()
         {
             var haxiGuid = new Guid("50d989c9-0a40-4f09-84e8-2bbaa78b3d92");
             var haxi = new Haxi
@@ -49,7 +49,6 @@ namespace WebApi31.Tests
             await Task.WhenAll(
                 Task.Run(() =>
                 {
-                    // Thread.Sleep(500);
                     tokenSource.Cancel();
                 }),
                 Task.Run(async () => responseMessage = await client.GetAsync(new Uri($"http://localhost/api/values/haxi?haxiIds={haxiGuid}"), token)));
