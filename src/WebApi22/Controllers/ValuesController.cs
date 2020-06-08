@@ -18,17 +18,10 @@ namespace WebApi22.Controllers
             [FromServices]IHaxiRepository haxiRepository,
             [FromQuery]Guid[] haxiIds)
         {
-            try
-            {
-                var dataSet = await haxiRepository.Get(
-                    haxiIds,
-                    cancellationToken);
-                return this.Ok(dataSet);
-            }
-            catch (TaskCanceledException)
-            {
-                return this.Ok("Cancelled.");
-            }
+            var dataSet = await haxiRepository.Get(
+                haxiIds,
+                cancellationToken);
+            return this.Ok(dataSet);
         }
 
         // GET api/values
