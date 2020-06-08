@@ -30,9 +30,9 @@ namespace WebApi22.Tests
             {
                 Id = haxiGuid
             };
-            Func<Guid[], CancellationToken, IList<Haxi>> mockingFunction = (_, cancellationToken) =>
+            Func<Guid[], CancellationToken, Task<IList<Haxi>>> mockingFunction = async (_, cancellationToken) =>
             {
-                Thread.Sleep(2000);
+                await Task.Delay(2000, cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
                 return new List<Haxi> { haxi };
             };
@@ -40,16 +40,16 @@ namespace WebApi22.Tests
             var repositoryMock = new Mock<IHaxiRepository>();
             repositoryMock
                 .Setup(repo => repo.Get(It.IsAny<Guid[]>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(mockingFunction);
+                .Returns(mockingFunction);
 
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
             var client = this.CreateHttpClient(repositoryMock);
             HttpResponseMessage responseMessage = null;
             await Task.WhenAll(
-                Task.Run(() =>
+                Task.Run(async () =>
                     {
-                        Thread.Sleep(500);
+                        await Task.Delay(500);
                         tokenSource.Cancel();
                     }),
                 Task.Run(async () =>
