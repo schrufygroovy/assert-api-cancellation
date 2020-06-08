@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 
 namespace WebApi22.Controllers
 {
@@ -10,6 +12,25 @@ namespace WebApi22.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        [HttpGet("haxi")]
+        public async Task<IActionResult> GetHaxi(
+            CancellationToken cancellationToken,
+            [FromServices]IHaxiRepository haxiRepository,
+            [FromQuery]Guid[] haxiIds)
+        {
+            try
+            {
+                var dataSet = await haxiRepository.Get(
+                    haxiIds,
+                    cancellationToken);
+                return this.Ok(dataSet);
+            }
+            catch (TaskCanceledException)
+            {
+                return this.Ok("Cancelled.");
+            }
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()

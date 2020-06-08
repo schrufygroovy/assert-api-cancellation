@@ -35,6 +35,8 @@ namespace WebApi22
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+
             app.UseMvc();
         }
     }
