@@ -44,7 +44,7 @@ namespace WebApi31.Tests
 
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
-            var client = this.CreateHttpClient(repositoryMock);
+            using var httpMessageHandler = this.CreateHttpMessageInvoker(repositoryMock);
             HttpResponseMessage responseMessage = null;
             await Task.WhenAll(
                 Task.Run(async () =>
@@ -54,7 +54,9 @@ namespace WebApi31.Tests
                     }),
                 Task.Run(async () =>
                     {
-                        responseMessage = await client.GetAsync(new Uri($"http://localhost/api/values/haxi?haxiIds={haxiGuid}"), token);
+                        responseMessage = await httpMessageHandler.SendAsync(
+                            new HttpRequestMessage(HttpMethod.Get, new Uri($"http://localhost/api/values/haxi?haxiIds={haxiGuid}")),
+                            token);
                     }));
             Assert.That(
                 responseMessage.StatusCode,
@@ -71,6 +73,18 @@ namespace WebApi31.Tests
                         services.AddScoped(typeof(IHaxiRepository), provider => repositoryMock.Object);
                     });
                 }).CreateClient();
+        }
+
+        private HttpMessageInvoker CreateHttpMessageInvoker(Mock<IHaxiRepository> repositoryMock)
+        {
+            return new HttpMessageInvoker(this.factory.WithWebHostBuilder(
+                builder =>
+                {
+                    builder.ConfigureTestServices(services =>
+                    {
+                        services.AddScoped(typeof(IHaxiRepository), provider => repositoryMock.Object);
+                    });
+                }).Server.CreateHandler(), true);
         }
     }
 }
