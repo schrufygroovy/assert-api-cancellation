@@ -44,7 +44,7 @@ namespace WebApi31.Tests
 
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
-            using var httpMessageHandler = this.CreateHttpMessageInvoker(repositoryMock);
+            using var httpMessageInvoker = this.CreateHttpMessageInvoker(repositoryMock);
             HttpResponseMessage responseMessage = null;
             await Task.WhenAll(
                 Task.Run(async () =>
@@ -54,7 +54,7 @@ namespace WebApi31.Tests
                     }),
                 Task.Run(async () =>
                     {
-                        responseMessage = await httpMessageHandler.SendAsync(
+                        responseMessage = await httpMessageInvoker.SendAsync(
                             new HttpRequestMessage(HttpMethod.Get, new Uri($"http://localhost/api/values/haxi?haxiIds={haxiGuid}")),
                             token);
                     }));
